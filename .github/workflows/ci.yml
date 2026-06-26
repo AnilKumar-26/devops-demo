@@ -1,0 +1,19 @@
+name: Build and test
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t devops-demo:${{ github.sha }} .
+
+      - name: Smoke test
+        run: |
+          docker run -d -p 8080:8080 --name test devops-demo:${{ github.sha }}
+          sleep 2
+          curl -f http://localhost:8080
+          docker stop test
